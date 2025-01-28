@@ -4,6 +4,7 @@
 # GitHub
 #    https://github.com/Korchy/1d_import_lst
 
+import random
 import bpy
 from bpy.props import StringProperty
 from bpy.types import Operator, Panel, Scene
@@ -13,7 +14,7 @@ bl_info = {
     "name": "Import LST",
     "description": "Add the Default Cube for each line of reading file and apply the format from this line to the created cube",
     "author": "Nikita Akimov, Paul Kotelevets",
-    "version": (1, 0, 0),
+    "version": (1, 0, 1),
     "blender": (2, 79, 0),
     "location": "View3D > Tool panel > 1D > Import LST",
     "doc_url": "https://github.com/Korchy/1d_import_lst",
@@ -59,8 +60,8 @@ class ImportLST:
 
         print("--- %s seconds ---" % (time.time() - start_time))
 
-    @staticmethod
-    def _process_lst_line(context, line):
+    @classmethod
+    def _process_lst_line(cls, context, line):
         # process single lst line
         # format: (object_name object_coord object_scale object_rotation_by_z material_name)
         # ex: (R9,25 (181.966 349.558 0.0) (2.5 2.5 2.5) 5.4862 крона)
@@ -84,8 +85,31 @@ class ImportLST:
                 # set scale
                 context.active_object.scale = obj_scale
                 # set material
-                if obj_mat and (obj_mat in context.blend_data.materials):
+                if obj_mat:
+                    if obj_mat not in context.blend_data.materials:
+                        cls._add_material(material_name=obj_mat)
                     context.active_object.data.materials.append(context.blend_data.materials[obj_mat])
+
+    @staticmethod
+    def _add_material(material_name):
+        # add material to the scene
+        # material
+        material = bpy.data.materials.get(material_name)
+        if not material:
+            material = bpy.data.materials.new(name=material_name)
+        # nodes
+        material.use_nodes = True
+        material_output = material.node_tree.nodes.get('Material Output')
+        if not material_output:
+            material_output = material.node_tree.nodes.new('ShaderNodeOutputMaterial')
+        material_output.location = (500.0, 200.0)
+        principled_bsdf = material.node_tree.nodes.get('Principled BSDF')
+        if not principled_bsdf:
+            principled_bsdf = material.node_tree.nodes.new('ShaderNodeBsdfPrincipled')
+        principled_bsdf.location = (0.0, 0.0)
+        principled_bsdf.inputs[0].default_value = (random.uniform(0,1), random.uniform(0,1), random.uniform(0,1), 1.0)
+        # links
+        material.node_tree.links.new(principled_bsdf.outputs[0], material_output.inputs[0])
 
     @staticmethod
     def ui(layout, context):

@@ -25,10 +25,12 @@ Blender version
 
 Current version
 -
-1.0.0
+1.0.1
 
 Version history
 -
+1.0.1
+- if material from processed line doesn't exists in the scene - create new and use it
 
 1.0.0
 - Release
