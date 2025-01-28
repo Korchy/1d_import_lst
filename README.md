@@ -25,10 +25,13 @@ Blender version
 
 Current version
 -
-1.0.1
+1.0.2
 
 Version history
 -
+1.0.2
+- added material color for new materials to its diffuse_color property
+
 1.0.1
 - if material from processed line doesn't exists in the scene - create new and use it
 

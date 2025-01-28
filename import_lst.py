@@ -14,7 +14,7 @@ bl_info = {
     "name": "Import LST",
     "description": "Add the Default Cube for each line of reading file and apply the format from this line to the created cube",
     "author": "Nikita Akimov, Paul Kotelevets",
-    "version": (1, 0, 1),
+    "version": (1, 0, 2),
     "blender": (2, 79, 0),
     "location": "View3D > Tool panel > 1D > Import LST",
     "doc_url": "https://github.com/Korchy/1d_import_lst",
@@ -98,6 +98,9 @@ class ImportLST:
         material = bpy.data.materials.get(material_name)
         if not material:
             material = bpy.data.materials.new(name=material_name)
+        # color
+        material_color = (random.uniform(0,1), random.uniform(0,1), random.uniform(0,1))
+        material.diffuse_color = material_color
         # nodes
         material.use_nodes = True
         material_output = material.node_tree.nodes.get('Material Output')
@@ -108,7 +111,7 @@ class ImportLST:
         if not principled_bsdf:
             principled_bsdf = material.node_tree.nodes.new('ShaderNodeBsdfPrincipled')
         principled_bsdf.location = (0.0, 0.0)
-        principled_bsdf.inputs[0].default_value = (random.uniform(0,1), random.uniform(0,1), random.uniform(0,1), 1.0)
+        principled_bsdf.inputs[0].default_value = material_color + (1.0,)
         # links
         material.node_tree.links.new(principled_bsdf.outputs[0], material_output.inputs[0])
 
