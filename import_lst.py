@@ -77,6 +77,7 @@ class ImportLST:
                 # print(obj_name, obj_co, obj_scale, obj_r_z, obj_mat)
                 # add the default cube
                 bpy.ops.mesh.primitive_cube_add(
+                    radius=0.5,
                     location=obj_co,
                     rotation=(0.0, 0.0, obj_r_z)
                 )
